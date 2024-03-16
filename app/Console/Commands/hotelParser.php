@@ -38,9 +38,10 @@ class hotelParser extends Command
             $row = [
                 'author' => $this->getInnerText($node->filter('.reviewer')),
                 'rating' => $this->getInnerText($node->filter('.review-score')),
+                'text_title' => $this->getInnerText($node->filter('.review-title')),
                 'text_like' => $this->getInnerText($node->filter('.review-pro')),
                 'text_dislike' => $this->getInnerText($node->filter('.review-contra')),
-                'date_publication' => $this->toTimestamp($this->getInnerText($node->filter('.review-date')))
+                'date_publication' => $this->formatDate($this->getInnerText($node->filter('.review-date')))
             ];
             if (!$row['text_like'] && !$row['text_dislike']) {
                 return null;
@@ -60,7 +61,7 @@ class hotelParser extends Command
     }
 
 
-    protected function toTimestamp($dateString)
+    protected function formatDate($dateString)
     {
         $mohthRelations = [
             'янв'  => '01',

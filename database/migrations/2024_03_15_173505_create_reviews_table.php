@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('author', 100)->comment('Имя автора');
             $table->decimal('rating',3 ,1)->nullable()->comment('Рейтинг');
+            $table->text('text_title')->nullable()->comment('Заголовок отзыва');
             $table->text('text_like')->nullable()->comment('Текст положительного отзыва');
             $table->text('text_dislike')->nullable()->comment('Текст отрицательного отзыва');
             $table->timestamp('date_publication')->comment('Дата отзыва');
