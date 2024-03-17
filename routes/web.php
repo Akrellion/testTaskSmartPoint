@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ReviewController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +18,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::group([], function () {
+    Route::get('/review', [ReviewController::class, 'index'])->name('review.index');
+    Route::get('/review/update', [ReviewController::class, 'update'])->name('review.update');
+});
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
