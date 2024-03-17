@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Review;
-use DateTime;
+use App\Services\ReviewService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\DomCrawler\Crawler;
@@ -24,6 +23,15 @@ class hotelParser extends Command
      */
     protected $description = 'Take comment data';
 
+    protected ReviewService $service;
+
+    public function __construct(ReviewService $service)
+    {
+        parent::__construct();
+
+        $this->service = $service;
+    }
+
     /**
      * Execute the console command.
      */
@@ -33,7 +41,6 @@ class hotelParser extends Command
 
         $crawler = new Crawler($html);
 
-        $rows = [];
         $rows = $crawler->filter('.review-container')->each(function (Crawler $node) {
             $row = [
                 'author' => $this->getInnerText($node->filter('.reviewer')),
@@ -41,48 +48,18 @@ class hotelParser extends Command
                 'text_title' => $this->getInnerText($node->filter('.review-title')),
                 'text_like' => $this->getInnerText($node->filter('.review-pro')),
                 'text_dislike' => $this->getInnerText($node->filter('.review-contra')),
-                'date_publication' => $this->formatDate($this->getInnerText($node->filter('.review-date')))
+                'date_publication' => $this->getInnerText($node->filter('.review-date'))
             ];
-            if (!$row['text_like'] && !$row['text_dislike']) {
-                return null;
-            }
 
             return $row;
         });
-        $rows = array_filter($rows);
 
-        Review::insert($rows);
+        $this->service->save($rows);
     }
 
 
     protected function getInnerText($selector)
     {
         return $selector->count() ? $selector->innerText() : null;
-    }
-
-
-    protected function formatDate($dateString)
-    {
-        $mohthRelations = [
-            'янв'  => '01',
-            'февр' => '02',
-            'март' => '03',
-            'апр'  => '04',
-            'май'  => '05',
-            'июнь' => '06',
-            'июль' => '07',
-            'авг'  => '08',
-            'сент' => '09',
-            'окт'  => '10',
-            'нояб' => '11',
-            'дек'  => '12'
-        ];
-        $dateArray = explode(' ', $dateString);
-        $dateArray[1] = $mohthRelations[mb_strtolower($dateArray[1])];
-        $dateString = implode('.', $dateArray);
-
-        $dateTime = new DateTime($dateString);
-
-        return $dateTime->format('Y-m-d');
     }
 }
