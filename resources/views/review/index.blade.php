@@ -1,5 +1,16 @@
 @extends('layouts.main')
 @section('content')
+    <div>
+        <a class="btn btn-primary mb-3" href="{{ route('review.update') }}">Обновить отзывы</a>
+    </div>
+    <div>
+        @if (session()->has('message'))
+            <div class="alert alert-success">{{ session('message') }}</div>
+        @endif
+        @if (session()->has('error'))
+            <div class="alert alert-danger text-nowrap overflow-hidden">{{ session('error') }}</div>
+        @endif
+    </div>
     <table class="table">
         <thead>
         <tr>
